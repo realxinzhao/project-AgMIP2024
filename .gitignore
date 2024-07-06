@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+data/AgMIP
+output/AgMIP/ProjectRDS
+GCAM_AgMIP_Submission*
