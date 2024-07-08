@@ -29,7 +29,6 @@ Add_To_AgMIP_Report <- function(.DF,
 
   }
 }
-Add_To_AgMIP_Report(.DF = GDPT)
 
 AgMIP_AggReg <- function(.DF, WMean = F){
 

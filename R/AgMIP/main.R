@@ -24,18 +24,18 @@ Project <- "AgMIP"
 
 ListJuly2024 <- readRDS(file.path(DIR_OUTPUT, Project, "ProjectRDS", paste0("ListJuly2024", ".RDS")))
 
-readr::read_csv("data/inst/AgMIP_Reporting.csv") -> AgMIP_Reporting
+readr::read_csv("data/inst/AgMIP_Reporting_Sets.csv") -> AgMIP_Reporting_Sets
 
 
 
 
-Scen_AgMIP <- AgMIP_Reporting %>% distinct(Scenario) %>% filter(!is.na(Scenario)) %>% pull
+Scen_AgMIP <- AgMIP_Reporting_Sets %>% distinct(Scenario) %>% filter(!is.na(Scenario)) %>% pull
 
 PluckBind <- function(.query){
   ListJuly2024 %>% purrr::pluck(.query) %>%
     select(-ss) %>% filter(year %in% 2015:2050) %>%
     mutate(scenario = factor(scenario,
-                             levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                             levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                            filter(!is.na(Scenario)) %>% pull)))
 }
 
@@ -56,7 +56,7 @@ ListJuly2024 %>%
   purrr::pluck("MeanTemp") %>%
   select(-ss) %>% filter(year %in% 2015:2050) %>%
   mutate(scenario = factor(scenario,
-                           levels = c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                           levels = c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                         filter(!is.na(Scenario)) %>% pull))) %>%
   filter(year == 2050) %>%
   ggplot() +

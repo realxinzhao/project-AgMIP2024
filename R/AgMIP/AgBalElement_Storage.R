@@ -11,7 +11,7 @@ PluckBind <- function(.query){
   ListJuly2024 %>% purrr::pluck(.query) %>%
     select(-ss) %>% filter(year %in% 2015:2050) %>%
     mutate(scenario = factor(scenario,
-                             levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                             levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                            filter(!is.na(Scenario)) %>% pull))) %>%
     mutate(branch = "AgMIP")
   #%>%

@@ -14,7 +14,7 @@ PluckBind <- function(.query){
   ListJuly2024 %>% purrr::pluck(.query) %>%
     select(-ss) %>% filter(year %in% 2015:2050) %>%
     mutate(scenario = factor(scenario,
-                             levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                             levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                            filter(!is.na(Scenario)) %>% pull))) %>%
     rename(region0 = region) %>%
     left_join_error_no_match(Regmapping %>% select(region0 = region, region = AgMIP13),
@@ -26,7 +26,7 @@ PluckBind <- function(.query){
 PluckBind("GDPNS") %>%
   transmute(Scenario = scenario, Region = region, Year = year,
             Value = value * gdp_deflator(2005, 1990) / 1000,
-            Variable = "GDPT", Item = "GDPT",
+            Variable = "GDPT", Item = "TOT",
             Unit = "bn USD 2005 MER") %>%
   AgMIP_AggReg ->
   GDPT
@@ -36,7 +36,7 @@ Add_To_AgMIP_Report(GDPT)
 PluckBind("POP") %>%
   Agg_reg(region) %>%
   transmute(Scenario = scenario, Region = region, Year = year,
-            Value = value /1000, Variable = "POPT", Item = "POPT",
+            Value = value /1000, Variable = "POPT", Item = "TOT",
             Unit = "million") %>%
   AgMIP_AggReg ->
   POPT
@@ -114,7 +114,7 @@ AREA_ALL %>%
 ListJuly2024 %>% purrr::pluck("Detailedland") %>%
   select(-ss) %>% filter(year %in% 2015) %>%
   mutate(scenario = factor(scenario,
-                           levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                           levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                          filter(!is.na(Scenario)) %>% pull))) %>%
   left_join(
     L2012.AgHAtoCL_irr_mgmt %>%
@@ -160,11 +160,11 @@ ExPrd_GCAM %>% mutate(YECC = (rcp7p0 / nocc - 1) * 100) %>%
   transmute(
     Region, Item, Variable = "YECC", Year, Value = YECC, Unit = "%", weight
   ) %>% repeat_add_columns(
-    AgMIP_Reporting %>% distinct(Scenario) %>%
+    AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
       filter(!is.na(Scenario))
   ) %>% filter(!grepl("NoCC", Scenario)) %>%
   mutate(Scenario = factor(Scenario,
-                         levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                         levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                        filter(!is.na(Scenario)) %>% pull))) ->
   YECC
 
@@ -220,7 +220,7 @@ LAND_ALL %>%
   ggplot() + facet_wrap(~Item, scales = "free_x") +
   geom_point(aes(x = Scenario, y = Value, fill = Year), shape = 21, color ="black") +
   coord_flip() +
-  labs(y = "Mt", x = "Scenario",
+  labs(y = "Mha", x = "Scenario",
        title = "MidCentury changes in land use across AgMIP Scenarios",
        subtitle = "AGR (Cropland & Pasture), CRP (Cropland), ECP (Energy Crop), For (Forest) \nGRS (Pasture), ONV (Other Natural)" ) +
   theme_bw() + theme0 + theme1 -> p;p
@@ -514,7 +514,7 @@ PluckBind <- function(.query){
   ListJuly2024 %>% purrr::pluck(.query) %>%
     select(-ss) %>% filter(year %in% 2015:2050) %>%
     mutate(scenario = factor(scenario,
-                             levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                             levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                            filter(!is.na(Scenario)) %>% pull))) %>%
     rename(region0 = region) %>%
     left_join_error_no_match(Regmapping %>% select(region0 = region, region = AgMIP13),
@@ -683,7 +683,7 @@ p %>% Write_png(.name = "Food_Calorie2050", .DIR_MODULE = DIR_MODULE, h = 16, w 
 ListJuly2024 %>% purrr::pluck("LaborWage") %>%
   select(-ss) %>% filter(year %in% 2015:2050) %>%
   mutate(scenario = factor(scenario,
-                           levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                           levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                          filter(!is.na(Scenario)) %>% pull))) %>%
   mutate(region = gsub("Labor_Ag", "", market)) %>%
   left_join(

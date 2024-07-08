@@ -12,7 +12,7 @@ PluckBind <- function(.query){
   ListJuly2024 %>% purrr::pluck(.query) %>%
     select(-ss) %>% filter(year %in% 2015:2050) %>%
     mutate(scenario = factor(scenario,
-                             levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                             levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                            filter(!is.na(Scenario)) %>% pull))) %>%
     rename(region0 = region) %>%
     left_join_error_no_match(Regmapping %>% select(region0 = region, region = AgMIP13),
@@ -39,16 +39,27 @@ ListJuly2024 %>% purrr::pluck("CO2Price")  %>%
 
 CTAX %>%
   distinct(Region, Variable, Item, Year, Unit) %>%
-  repeat_add_columns(AgMIP_Reporting %>% distinct(Scenario) %>% filter(!is.na(Scenario)) ) %>%
+  repeat_add_columns(AgMIP_Reporting_Sets %>% distinct(Scenario) %>% filter(!is.na(Scenario)) ) %>%
   left_join(CTAX, by = c("Region", "Variable", "Item", "Year", "Unit", "Scenario")) %>%
   replace_na(list(Value = 0)) %>%
   mutate(Scenario = factor(Scenario,
-                           levels =  c(AgMIP_Reporting %>% distinct(Scenario) %>%
+                           levels =  c(AgMIP_Reporting_Sets %>% distinct(Scenario) %>%
                                          filter(!is.na(Scenario)) %>% pull))) ->
   CTAX
 
+CTAX %>% filter(Year >= 2025) %>%
+  ggplot() +
+  geom_line(aes(x = Year, y = Value, color = Scenario)) +
+  labs(y = "2015 USD/tCO2", x = "Year",
+       title = "Carbon prices") +
+  theme_bw() + theme0 -> p;p
+
+p %>% Write_png(.name = "CTAX", .DIR_MODULE = DIR_MODULE, h = 5, w = 6, r = 300)
+
 # ***CTAX ----
 Add_To_AgMIP_Report(CTAX)
+
+
 
 
 # ECH4 EN2O ECO2 NCEM ----
@@ -359,7 +370,7 @@ p %>% Write_png(.name = "FRTN", .DIR_MODULE = DIR_MODULE, h = 7, w = 8, r = 300)
 # 17 dataframes
 
 AgMIP_Report %>% length()
-AgMIP_Report %>% name()
+AgMIP_Report %>% names()
 
 AgMIP_Report %>% bind_rows %>%
   mutate(Model = "GCAM") %>%
@@ -367,7 +378,7 @@ AgMIP_Report %>% bind_rows %>%
   AgMIP_Report_Export
 
 AgMIP_Report_Export %>%
-  readr::write_csv("output/AgMIP/GCAM_AgMIP_Submission_07052024.csv")
+  readr::write_csv("output/AgMIP/GCAM_AgMIP_Submission_07062024.csv")
 
 
 
